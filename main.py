@@ -5,9 +5,7 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 import pandas as pd
 
-place_name = "Srodmiescie, Warsaw, Poland"
-graph = ox.graph_from_place(place_name, network_type='drive')
-graph_proj = ox.project_graph(graph)
+graph_proj = nx.read_gpickle("places/srodmiescie.gpickle")
 nodes_proj, edges_proj = ox.graph_to_gdfs(graph_proj, nodes=True, edges=True)
 
 bbox = box(*edges_proj.unary_union.bounds)
@@ -25,4 +23,7 @@ start_node = ox.get_nearest_node(graph_proj, start_xy, method='euclidean')
 end_node = ox.get_nearest_node(graph_proj, end_xy, method='euclidean')
 
 route = nx.shortest_path(G=graph_proj, source=start_node, target=end_node, weight='length')
+route_length = nx.shortest_path_length(G=graph_proj, source=start_node, target=end_node, weight='length')
 fig, ax = ox.plot_graph_route(graph_proj, route, origin_point=start_xy, destination_point=end_xy)
+
+print(route_length)
