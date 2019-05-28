@@ -7,5 +7,4 @@ file_name = "srodmiescie.gpickle"
 
 # script body
 graph = ox.graph_from_place(place_name, network_type='drive')
-graph_proj = ox.project_graph(graph)
-nx.write_gpickle(graph_proj, "places/"+file_name)
+nx.write_gpickle(graph, "places/"+file_name)
