@@ -44,7 +44,10 @@ def main():
     print('\nShortest route length:\t' + str(route_length) + ' meters')
     if input('\nShow route on map? [y/n]\t') == 'y':
         print('Close map to end the program...')
-        ox.plot_graph_route(graph, route)
+        fig, ax = ox.plot_graph_route(graph, route, show=False, close=False)
+        ax.scatter(start_lon, start_lat, c='g', marker='x')
+        ax.scatter(end_lon, end_lat, c='b', marker='x')
+        plt.show()
 
     print("\nGood bye!")
 
