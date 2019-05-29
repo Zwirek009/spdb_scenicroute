@@ -41,13 +41,22 @@ def main():
     route_length = nx.shortest_path_length(G=graph, source=start_node, target=end_node, weight='length')
     print('DONE')
 
-    print('\nShortest route length:\t' + str(route_length) + ' meters')
+    print('Shortest route length:\t' + str(route_length) + ' meters')
     if input('\nShow route on map? [y/n]\t') == 'y':
-        print('Close map to end the program...')
+        print('Close map to continue...')
         fig, ax = ox.plot_graph_route(graph, route, show=False, close=False)
         ax.scatter(start_lon, start_lat, c='g', marker='x')
         ax.scatter(end_lon, end_lat, c='b', marker='x')
         plt.show()
+
+    print('\nScenic routes preference:')
+    if input('Use default? [y/n]\t') == 'n':
+        max_extra_dist = float(input('Type max extra distance [m]:\t'))
+        min_scenic_dist = float(input('Type min scenic distance [m]:\t'))
+    else:
+        max_extra_dist = float(2000)
+        min_scenic_dist = float(500)
+    print('DONE')
 
     print("\nGood bye!")
 
