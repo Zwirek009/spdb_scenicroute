@@ -9,6 +9,43 @@ def find_nearest_node(graph, latitude, longtitude):
     point = (latitude, longtitude)
     return point, ox.get_nearest_node(graph, point, method='euclidean')
 
+def create_route(graph, start_lat, start_lon, end_lat, end_lon):
+    _, start_node = find_nearest_node(graph, start_lat, start_lon)
+    _, end_node = find_nearest_node(graph, end_lat, end_lon)
+    return nx.shortest_path(G=graph, source=start_node, target=end_node, weight='length')
+
+def create_scenic_routes(graph, nodes_proj):
+    scenic_routes = []
+    scenic_routes.append(create_route(
+        graph,
+        float((nodes_proj['lat'].min() + nodes_proj['lat'].max()) / 2),
+        float((nodes_proj['lon'].min() + nodes_proj['lon'].max()) / 2),
+        float(((nodes_proj['lat'].min() + nodes_proj['lat'].max()) / 2) + 0.01),
+        float(((nodes_proj['lon'].min() + nodes_proj['lon'].max()) / 2) + 0.01)
+    ))
+    scenic_routes.append(create_route(
+        graph,
+        float(((nodes_proj['lat'].min() + nodes_proj['lat'].max()) / 2) - 0.02),
+        float(((nodes_proj['lon'].min() + nodes_proj['lon'].max()) / 2) - 0.02),
+        float(((nodes_proj['lat'].min() + nodes_proj['lat'].max()) / 2) - 0.02),
+        float(((nodes_proj['lon'].min() + nodes_proj['lon'].max()) / 2) + 0.02)
+    ))
+    scenic_routes.append(create_route(
+        graph,
+        float(((nodes_proj['lat'].min() + nodes_proj['lat'].max()) / 2) + 0.03),
+        float(((nodes_proj['lon'].min() + nodes_proj['lon'].max()) / 2) - 0.01),
+        float(((nodes_proj['lat'].min() + nodes_proj['lat'].max()) / 2) + 0.02),
+        float(((nodes_proj['lon'].min() + nodes_proj['lon'].max()) / 2) + 0.05)
+    ))
+    scenic_routes.append(create_route(
+        graph,
+        float(((nodes_proj['lat'].min() + nodes_proj['lat'].max()) / 2) - 0.005),
+        float(((nodes_proj['lon'].min() + nodes_proj['lon'].max()) / 2) - 0.05),
+        float(((nodes_proj['lat'].min() + nodes_proj['lat'].max()) / 2) - 0.1),
+        float(((nodes_proj['lon'].min() + nodes_proj['lon'].max()) / 2) + 0.01)
+    ))
+    return scenic_routes
+
 def main():
     print('Welcome to ScenicRoute app!')
     print('\nLoading srodmiescie.gpickle routes graph...')
@@ -57,6 +94,15 @@ def main():
         max_extra_dist = float(2000)
         min_scenic_dist = float(500)
     print('DONE')
+
+    scenic_routes = create_scenic_routes(graph, nodes_proj)
+    fig, ax = ox.plot_graph_route(graph, route, show=False, close=False)
+    ax.scatter(start_lon, start_lat, c='g', marker='x')
+    ax.scatter(end_lon, end_lat, c='b', marker='x')
+    fig_sc, ax_sc = ox.plot_graph_routes(graph, scenic_routes, route_color='y', show=False, close=False)
+    ax_sc.scatter(start_lon, start_lat, c='g', marker='x')
+    ax_sc.scatter(end_lon, end_lat, c='b', marker='x')
+    plt.show()
 
     print("\nGood bye!")
 
