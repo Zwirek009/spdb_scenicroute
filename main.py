@@ -52,6 +52,7 @@ def main():
     graph = nx.read_gpickle("places/srodmiescie.gpickle")
     graph_proj = ox.project_graph(graph)
     nodes_proj, edges_proj = ox.graph_to_gdfs(graph_proj, nodes=True, edges=True)
+    scenic_routes = create_scenic_routes(graph, nodes_proj)
     print('DONE')
 
     print('\nAvailable longtitudes:\t' + str(nodes_proj['lon'].min()) + '-' + str(nodes_proj['lon'].max()))
@@ -84,6 +85,9 @@ def main():
         fig, ax = ox.plot_graph_route(graph, route, show=False, close=False)
         ax.scatter(start_lon, start_lat, c='g', marker='x')
         ax.scatter(end_lon, end_lat, c='b', marker='x')
+        fig_sc, ax_sc = ox.plot_graph_routes(graph, scenic_routes, route_color='y', show=False, close=False)
+        ax_sc.scatter(start_lon, start_lat, c='g', marker='x')
+        ax_sc.scatter(end_lon, end_lat, c='b', marker='x')
         plt.show()
 
     print('\nScenic routes preference:')
@@ -94,15 +98,6 @@ def main():
         max_extra_dist = float(2000)
         min_scenic_dist = float(500)
     print('DONE')
-
-    scenic_routes = create_scenic_routes(graph, nodes_proj)
-    fig, ax = ox.plot_graph_route(graph, route, show=False, close=False)
-    ax.scatter(start_lon, start_lat, c='g', marker='x')
-    ax.scatter(end_lon, end_lat, c='b', marker='x')
-    fig_sc, ax_sc = ox.plot_graph_routes(graph, scenic_routes, route_color='y', show=False, close=False)
-    ax_sc.scatter(start_lon, start_lat, c='g', marker='x')
-    ax_sc.scatter(end_lon, end_lat, c='b', marker='x')
-    plt.show()
 
     print("\nGood bye!")
 
