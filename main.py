@@ -5,14 +5,17 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 import pandas as pd
 
+
 def find_nearest_node(graph, latitude, longtitude):
     point = (latitude, longtitude)
     return point, ox.get_nearest_node(graph, point, method='euclidean')
+
 
 def create_route(graph, start_lat, start_lon, end_lat, end_lon):
     _, start_node = find_nearest_node(graph, start_lat, start_lon)
     _, end_node = find_nearest_node(graph, end_lat, end_lon)
     return nx.shortest_path(G=graph, source=start_node, target=end_node, weight='length')
+
 
 def create_scenic_routes(graph, nodes_proj):
     scenic_routes = []
@@ -46,6 +49,33 @@ def create_scenic_routes(graph, nodes_proj):
     ))
     return scenic_routes
 
+
+#TODO something do not work, to be debugged
+def get_common_routes_distance(single_route, route_set, graph):
+    common_distance = 0
+    for route_from_set in route_set:
+        start_common_node = -1
+        end_common_node = -1
+        for node in single_route:
+            if (start_common_node == -1) and (node in route_from_set):
+                start_common_node = node
+            if (start_common_node != -1) and (node in route_from_set):
+                end_common_node = node
+            if (start_common_node != -1) and (node not in route_from_set) and start_common_node != end_common_node:
+                common_distance += nx.shortest_path_length(G=graph, source=start_common_node, target=end_common_node, weight='length')
+                start_common_node = -1
+                end_common_node = -1
+        for node in reversed(single_route):
+            if (start_common_node == -1) and (node in route_from_set):
+                start_common_node = node
+            if (start_common_node != -1) and (node in route_from_set):
+                end_common_node = node
+            if (start_common_node != -1) and (node not in route_from_set) and start_common_node != end_common_node:
+                common_distance += nx.shortest_path_length(G=graph, source=start_common_node, target=end_common_node, weight='length')
+                start_common_node = -1
+                end_common_node = -1
+
+
 def main():
     print('Welcome to ScenicRoute app!')
     print('\nLoading srodmiescie.gpickle routes graph...')
@@ -77,9 +107,12 @@ def main():
 
     route = nx.shortest_path(G=graph, source=start_node, target=end_node, weight='length')
     route_length = nx.shortest_path_length(G=graph, source=start_node, target=end_node, weight='length')
+    route_scenic_distance = get_common_routes_distance(route, scenic_routes, graph)
     print('DONE')
 
     print('Shortest route length:\t' + str(route_length) + ' meters')
+    print('Shortest route scenic distance:\t' + str(route_scenic_distance) + ' meters')
+
     if input('\nShow route on map? [y/n]\t') == 'y':
         print('Close map to continue...')
         fig, ax = ox.plot_graph_route(graph, route, show=False, close=False)
